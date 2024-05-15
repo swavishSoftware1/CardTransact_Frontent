@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { LoadButton } from "../../components/LoadButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CustomText from "../../components/CustomText";
 import OtpInput from "react-otp-input";
 import Divider from "@mui/material/Divider";
 import AuthCustomBox from "../../components/AuthCustomBox";
+import axios from "axios";
+import { Apis } from "../../utils/apis";
 
 const GoogleAuthentication = () => {
+  let [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  let email = searchParams.get("email");
+  let password = searchParams.get("password");
+  console.log(email, password);
 
   const redirectLogin = () => {
     navigate("/auth/login");
@@ -20,11 +26,36 @@ const GoogleAuthentication = () => {
     navigate("/dashboard");
   };
 
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post(
+        Apis.verifyOTP,
+        { email, otp },
+        {
+          params: {
+            type: "employee",
+          },
+        }
+      );
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false);
+  };
+
   return (
     <>
       <AuthCustomBox header="Google">
         <Box sx={{ textAlign: "center" }}>
-          <Box sx={{ display: "flex", alignItems: "baseline", justifyContent: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "center",
+            }}
+          >
             <Typography
               style={{
                 color: "#04609A",
@@ -35,7 +66,9 @@ const GoogleAuthentication = () => {
             >
               Authentication
             </Typography>
-            <Typography sx={{color: "#04609A",fontSize: "2rem"}}>/</Typography>
+            <Typography sx={{ color: "#04609A", fontSize: "2rem" }}>
+              /
+            </Typography>
             <Typography
               style={{
                 color: "#04609A",
@@ -112,7 +145,7 @@ const GoogleAuthentication = () => {
             ></CustomText>
           </Box>
           <LoadButton
-            onClick={redirectforgetPassword}
+            onClick={handleSubmit}
             type="submit"
             loading={loading}
             variant="contained"

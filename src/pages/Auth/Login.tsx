@@ -7,9 +7,10 @@ import AuthCustomBox from "../../components/AuthCustomBox";
 import { loginSchema } from "../../utils/Validation";
 import { Formik } from "formik";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { Apis } from "../../utils/apis";
 
-
- const Login = () => {
+const Login = () => {
   //const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -21,28 +22,36 @@ import { Link } from "react-router-dom";
   //   navigate("/auth/ForgetPassword");
   // };
 
-  const handleLogin = () => {
-    navigate("/auth/googleAuthentication");
+  const handleLogin = async (values: { email: string; password: string }) => {
+    try {
+      const { data } = await axios.post(Apis.login, values, {
+        params: {
+          type: "employee",
+        },
+      });
+      navigate(
+        `/auth/googleAuthentication?email=${values.email}&password=${values.password}`
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
     <AuthCustomBox header="Login">
-      <Box sx={{marginTop: "2rem"}}>
+      <Box sx={{ marginTop: "2rem" }}>
         <Formik
           initialValues={values}
           validationSchema={loginSchema}
           onSubmit={handleLogin}
         >
-          {({ 
-            values, errors, handleSubmit, handleChange
-           }) => (
+          {({ values, errors, handleSubmit, handleChange }) => (
             <form
               onSubmit={handleSubmit}
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap:10
-               
+                gap: 10,
               }}
             >
               <CustomTextInput
@@ -73,9 +82,8 @@ import { Link } from "react-router-dom";
                   cursor: "pointer",
                   textAlign: "left",
                   display: "inline",
-                  width: "fit-content"
+                  width: "fit-content",
                 }}
-               
               >
                 Forgot Password?
               </Link>
@@ -100,5 +108,3 @@ import { Link } from "react-router-dom";
   );
 };
 export default Login;
-
-
